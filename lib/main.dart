@@ -1,9 +1,11 @@
+import 'package:despesas_pessoais/components/chart.dart';
 import 'package:despesas_pessoais/components/transaction_form.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import './components/transaction_list.dart';
 import '../models/transaction.dart';
 import 'dart:math';
+import 'components/chart.dart';
 
 main() => runApp(ExpensesApp());
 
@@ -13,7 +15,7 @@ class ExpensesApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData tema = ThemeData();
- 
+
     return MaterialApp(
       home: MyHomePage(),
       theme: tema.copyWith(
@@ -49,14 +51,22 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final _transaction = [
+  final List<Transaction> _transaction = [
+    Transaction(
+        id: 't0',
+        title: 'Conta antiga',
+        value: 400.76,
+        date: DateTime.now().subtract(Duration(days: 33))),
     Transaction(
         id: 't1',
         title: 'Novo Tenis de Corrida',
         value: 310.76,
-        date: DateTime.now()),
+        date: DateTime.now().subtract(Duration(days: 3))),
     Transaction(
-        id: 't2', title: 'Conta de Luz', value: 211.30, date: DateTime.now()),
+        id: 't2',
+        title: 'Conta de Luz',
+        value: 211.30,
+        date: DateTime.now().subtract(Duration(days: 4))),
   ];
 
   _openTransactionFormModal(BuildContext context) {
@@ -65,6 +75,14 @@ class _MyHomePageState extends State<MyHomePage> {
         builder: (_) {
           return TransactionForm(_addTransaction);
         });
+  }
+
+  List<Transaction> get _recentTransaction {
+    return _transaction.where((tr) {
+      return tr.date.isAfter(DateTime.now().subtract(
+        Duration(days: 7),
+      ));
+    }).toList();
   }
 
   _addTransaction(String title, double value) {
@@ -91,26 +109,24 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: [
           IconButton(
             onPressed: () => _openTransactionFormModal(context),
-            icon: const Icon(Icons.add),
+            icon: Icon(
+              Icons.add,
+            color: Theme.of(context).colorScheme.secondary,
+            ),
           ),
         ],
       ),
       body: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SizedBox(
-              width: double.infinity,
-              child: const Card(
-                color: Colors.blue,
-                elevation: 5,
-                child: Text('Grafico'),
-              ),
-            ),
+            Chart(_recentTransaction),
             TransactionList(_transaction),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Theme.of(context).colorScheme.secondary,
         child: const Icon(Icons.add),
         onPressed: () => _openTransactionFormModal(context),
       ),
