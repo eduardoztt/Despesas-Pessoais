@@ -5,13 +5,14 @@ import 'package:intl/intl.dart';
 
 class TransactionList extends StatelessWidget {
   final List<Transaction> transaction;
+  final void Function(String) onRemove;
 
-  const TransactionList(this.transaction, {super.key});
+  const TransactionList(this.transaction,this.onRemove);
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 300,
+      height: 440,
       child: transaction.isEmpty
           ? Column(
               children: [
@@ -58,6 +59,13 @@ class TransactionList extends StatelessWidget {
                     ),
                     subtitle: Text(
                       DateFormat('d/M/y').format(tr.date),
+                    ),
+                    trailing: IconButton(
+                      color: Theme.of(context).colorScheme.error,
+                      onPressed: () => onRemove(tr.id),
+                      icon: Icon(
+                        Icons.delete,
+                      ),
                     ),
                   ),
                 );
